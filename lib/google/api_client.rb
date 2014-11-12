@@ -675,10 +675,12 @@ module Google
         next unless exception.kind_of?(ClientError)
         if exception.result.status == 401 && can_refresh && tries == 1
           begin
-            logger.debug("Attempting refresh of access token & retry of request")
+            logger.debug("#{self.class} attempting refresh of access token & retry of request due to exception #{exception}")
             authorization.fetch_access_token!
             next
-          rescue Signet::AuthorizationError
+          rescue Signet::AuthorizationError => e
+            logger.error("#{self.class} fetch_access_token! failed: #{e}")
+            logger.error("  response = #{e.response.status} #{e.response.body}") if e.response
           end
         end
         raise exception

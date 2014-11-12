@@ -1,5 +1,14 @@
 # Google API Client
 
+## ETS Fork for CalCentral/Junction
+
+`Signet::OAuth2::Client`'s `fetch_access_token` and `fetch_protected_resource` embed the HTTP response in a `Signet::AuthorizationError`
+exception when a token refresh request fails. But `Google::APIClient's execute!` method simply throws away the exception without
+any message when it is raised on the attempted auto-refresh from the stored refresh token. This is exactly the scenario
+which creates the most problems for our users, and so this fork has been created to improve the logging in
+`Google::APIClient execute!` to help us research the problem. If the change proves useful for our project, we
+will submit a pull request.
+
 <dl>
   <dt>Homepage</dt><dd><a href="http://www.github.com/google/google-api-ruby-client">http://www.github.com/google/google-api-ruby-client</a></dd>
   <dt>Authors</dt><dd>Bob Aman, <a href="mailto:sbazyl@google.com">Steven Bazyl</a></dd>

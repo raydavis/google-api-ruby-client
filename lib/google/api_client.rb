@@ -609,10 +609,13 @@ module Google
           when 400...500
             if result.status == 401 && request.authorization.respond_to?(:refresh_token) && auto_refresh_token
               begin
-                logger.debug("Attempting refresh of access token & retry of request")
+                logger.debug("#{self.class} Attempting refresh of access token & retry of request due to #{result.status} #{result.error_message}")
                 request.authorization.fetch_access_token!
-              rescue Signet::AuthorizationError
-                 # Ignore since we want the original error
+              rescue Signet::AuthorizationError => e
+                 # Log the reasons for token renewal failure.
+                 log_message = "#{self.class} fetch_access_token! failed: #{e}"
+                 log_message.concat(", response = #{e.response.status} #{e.response.body}") if e.response
+                 logger.error(log_message)
               end
             end
             raise ClientError.new(result.error_message || "A client error has occurred", result)
